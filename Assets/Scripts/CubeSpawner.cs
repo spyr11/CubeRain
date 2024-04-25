@@ -42,8 +42,6 @@ public class CubeSpawner : MonoBehaviour
     private void GetObject()
     {
         _pool.Get();
-
-        Debug.Log(_pool.CountAll);
     }
 
     private void ActionOnGet(GameObject cubeObject)
