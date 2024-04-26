@@ -29,6 +29,7 @@ public class Cube : MonoBehaviour
 
         SetDefaultColor();
     }
+
     private void OnDisable()
     {
         Hit?.Invoke(this);
