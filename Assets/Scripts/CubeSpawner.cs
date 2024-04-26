@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -28,25 +29,34 @@ public class CubeSpawner : MonoBehaviour
 
     private void Start()
     {
-        InvokeRepeating(nameof(GetObject), 0f, _spawnDelay);
+        StartCoroutine(SpawnObject(_spawnDelay));
     }
 
-    private void GetObject()
+    private IEnumerator SpawnObject(float delay)
     {
-        _pool.Get();
+        WaitForSeconds waitForSeconds = new WaitForSeconds(delay);
+
+        bool isExecute = true;
+
+        while (isExecute)
+        {
+            _pool.Get();
+
+            yield return waitForSeconds;
+        }
     }
 
     private void ActionOnGet(Cube cube)
     {
-        cube.Hit += OnHit;
+        cube.Disabled += OnDisabled;
 
         cube.gameObject.SetActive(true);
         cube.gameObject.transform.position = GetPosition();
     }
 
-    private void OnHit(Cube cube)
+    private void OnDisabled(Cube cube)
     {
-        cube.Hit -= OnHit;
+        cube.Disabled -= OnDisabled;
 
         _pool.Release(cube);
     }

@@ -11,7 +11,7 @@ public class Cube : MonoBehaviour
     private int _destroyMaxValue;
     private bool _hasHit;
 
-    public event Action<Cube> Hit;
+    public event Action<Cube> Disabled;
 
     private void Awake()
     {
@@ -32,7 +32,7 @@ public class Cube : MonoBehaviour
 
     private void OnDisable()
     {
-        Hit?.Invoke(this);
+        Disabled?.Invoke(this);
     }
 
     private void OnCollisionEnter(Collision collision)
