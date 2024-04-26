@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -8,27 +7,20 @@ public class CubeSpawner : MonoBehaviour
     [SerializeField] private Cube _cube;
     [SerializeField, Range(0, int.MaxValue)] private float _spawnDelay;
 
-    private int _destroyMinValue;
-    private int _destroyMaxValue;
     private int _poolCapacity;
     private int _poolMaxSize;
-
-    private ObjectPool<GameObject> _pool;
-
+    private ObjectPool<Cube> _pool;
     private Vector3 _spawnArea;
 
     private void Awake()
     {
-        _destroyMinValue = 2;
-        _destroyMaxValue = 6;
         _poolCapacity = 10;
         _poolMaxSize = 10;
 
-        _pool = new ObjectPool<GameObject>(
-               createFunc: () => Instantiate(_cube.gameObject),
+        _pool = new ObjectPool<Cube>(
+               createFunc: () => Instantiate(_cube),
                actionOnGet: (cube) => ActionOnGet(cube),
-               actionOnRelease: (cube) => cube.SetActive(false),
-               actionOnDestroy: (cube) => Destroy(cube),
+               actionOnDestroy: (cube) => Destroy(cube.gameObject),
                defaultCapacity: _poolCapacity,
                maxSize: _poolMaxSize
            );
@@ -44,32 +36,22 @@ public class CubeSpawner : MonoBehaviour
         _pool.Get();
     }
 
-    private void ActionOnGet(GameObject cubeObject)
+    private void ActionOnGet(Cube cube)
     {
-        Cube cube = cubeObject.GetComponent<Cube>();
         cube.Hit += OnHit;
 
-        cubeObject.SetActive(true);
-        cubeObject.transform.position = SetArea();
+        cube.gameObject.SetActive(true);
+        cube.gameObject.transform.position = GetPosition();
     }
 
     private void OnHit(Cube cube)
     {
-        StartCoroutine(DisableOnDelay(cube));
-    }
-
-    private IEnumerator DisableOnDelay(Cube cube)
-    {
         cube.Hit -= OnHit;
 
-        float destroyDelay = Random.Range(_destroyMinValue, _destroyMaxValue);
-
-        yield return new WaitForSeconds(destroyDelay);
-
-        _pool.Release(cube.gameObject);
+        _pool.Release(cube);
     }
 
-    private Vector3 SetArea()
+    private Vector3 GetPosition()
     {
         Bounds bound = _floor.bounds;
 
